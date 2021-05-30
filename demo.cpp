@@ -23,6 +23,22 @@ void report_and_exit(const char* msg) {
   exit(-1);
 }
 
+void increment_pointer_to_int(int * p){
+    std::cout << "BEFORE Value: " << *p << " p: " << p << std::endl;
+    (*p)++;
+    std::cout << "AFTER  Value: " << *p << " p: " << p << std::endl;
+
+}
+
+void increment_reference_to_int(int & r){
+
+    r++;
+}
+
+int increment_value_of_int(int v){
+    return (v+1);
+}
+
 void display_image_from_shared_memory(const caddr_t& memptr){
     auto image = cv::Mat(512,512, CV_8U, memptr);
     cv::imshow("Output", image);
