@@ -17,6 +17,6 @@ void increment_shared_integer(const std::atomic<int>& memprt);
 void increment_pointer_to_int(int * p);
 void increment_reference_to_int(int & r);
 int increment_value_of_int(int v);
-
+void close_shared_memory(std::atomic<int>*  memptr);
 }
 #endif //IPC_LIBRARY_DEMO_H

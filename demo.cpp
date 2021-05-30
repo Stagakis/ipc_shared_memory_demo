@@ -24,9 +24,9 @@ void report_and_exit(const char* msg) {
 }
 
 void increment_pointer_to_int(int * p){
-    std::cout << "BEFORE Value: " << *p << " p: " << p << std::endl;
+    std::cout << "BEFORE Value: " << *p << " p: " << (void *)p << std::endl;
     (*p)++;
-    std::cout << "AFTER  Value: " << *p << " p: " << p << std::endl;
+    std::cout << "AFTER  Value: " << *p << " p: " << (void *)p << std::endl;
 
 }
 
@@ -73,16 +73,28 @@ int * create_shared_memory(){
     ftruncate(fd, ByteSize); /* get the bytes */
 
     //std::atomic<int> atomic_test {0};
-    return static_cast<int *>(mmap(NULL,       /* let system pick where to put segment */
+    return
+        static_cast<int *>(mmap(NULL,       /* let system pick where to put segment */
                                                ByteSize,   /* how many bytes */
                                                PROT_READ | PROT_WRITE, /* access protections */
                                                MAP_SHARED, /* mapping visible to other processes */
                                                fd,         /* file descriptor */
                                                0));         /* offset: start at 1st byte */
+
+
+
+}
+
+
+void close_shared_memory(std::atomic<int>*  memptr){
+    std::cout << "pointer received: " << (void *) memptr << std::endl;
+    munmap(memptr, ByteSize); /* unmap the storage */
+
+    shm_unlink(BackingFile); /* unlink from the backing file */
+
 }
 
 void increment_shared_integer(const std::atomic<int>& memprt){
-
 
 
 }
