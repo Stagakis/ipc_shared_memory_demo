@@ -26,8 +26,6 @@ target_link_libraries(ipc_demo_no_atomic PUBLIC ${OpenCV_LIBS} )
 
 project(ipc_library VERSION 1.0.0 DESCRIPTION "my_shared_ipc description")
 add_library(ipc_library SHARED
-        demo.cpp
-        demo.h
         triple_buffer_ipc.cpp
         triple_buffer_ipc.h)
 target_link_libraries(ipc_library PUBLIC -lpthread)

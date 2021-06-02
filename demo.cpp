@@ -88,7 +88,6 @@ void producer(){
 
 
 int main() {
-    string_test(std::string("petros einai xontros").c_str());
     std::cout << "0 for producer and 1 for consumer" << std::endl;
     int choice;
     std::cin >> choice;
