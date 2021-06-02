@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <unistd.h>
 
-#include <iostream> //TODO delete this
-
 void report_and_exit(const char* msg) {
     perror(msg);
     exit(-1);
@@ -27,7 +25,8 @@ MEMPTR create_shared_memory(const char * const name, unsigned int single_buffer_
                       0666);             /* access permissions */
     if (fd < 0) report_and_exit("Can't open shared mem segment...");
 
-    ftruncate(fd, final_size); /* get the bytes */
+    int ft = ftruncate(fd, final_size); /* get the bytes */
+    if (ft < 0) report_and_exit("Can't resize file with ftruncate...");
 
     auto buffers = static_cast<void *>(mmap(NULL,       /* let system pick where to put segment */
                                             final_size,   /* how many bytes */

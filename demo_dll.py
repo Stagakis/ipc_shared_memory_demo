@@ -4,7 +4,6 @@ import time
 import cv2
 from tbipc import SharedMemory
 
-
 #How to load global variables
 dims = 3
 image_width = 1024
@@ -20,11 +19,6 @@ def producer(mem):
 def consumer(mem):
     while(True):
         pointer = mem.read_from_shared_memory()
-        
-        #This is how you do pointer arithmetics, they need to be done on c_void_p because no other has .value method
-        #print(pointer)
-        #pointer = cast(pointer, c_void_p).value + 4        
-        #print(pointer)
 
         pointer = cast(pointer, POINTER(c_uint8))
 
@@ -38,13 +32,12 @@ def consumer(mem):
 name = "/shMemEx"
 mem = SharedMemory(name, buffer_size)
 
-#print(mem._mem.contents.filename)
-#print("after print")
-#print(mem._mem.contents.filename)
 
-input(".................Waiting to start...................")
-producer(mem)
-#consumer(mem)
+choice = input("0 for producer or 1 for consumer")
+if(choice == 0):
+    producer(mem)
+else:
+    consumer(mem)
 mem.close_shared_memory()
 
 

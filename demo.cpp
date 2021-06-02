@@ -7,7 +7,6 @@
 #include <opencv2/highgui.hpp>
 #include "demo.h"
 #include <chrono>
-//#include "shmem.h"
 #include <unistd.h>
 
 using namespace std::chrono;
