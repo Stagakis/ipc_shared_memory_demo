@@ -12,13 +12,23 @@ extern const int dims = 3;
 
 extern "C"
 {
-
+/*//
 struct BufferFlags{
     std::atomic<unsigned long int> read_buffer_offset;
     std::atomic<unsigned long int> back_buffer_offset;
     std::atomic<unsigned long int> write_buffer_offset;
     std::atomic<unsigned long int> dirty;
 };
+//*/
+
+//*/
+struct BufferFlags{
+    unsigned long int read_buffer_offset;
+    std::atomic<unsigned long int> back_buffer_offset;
+    unsigned long int write_buffer_offset;
+    std::atomic<unsigned long int> dirty;
+};
+//*/
 
 struct SharedMemory{
     void * buffers;

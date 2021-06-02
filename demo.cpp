@@ -81,13 +81,13 @@ void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int off
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags) + offset];
 
     memcpy(
-            &buffers_data[flags->write_buffer_offset.load()],
+            &buffers_data[flags->write_buffer_offset],
             data,
             mem->single_size
             );
 
-    unsigned int old_value = flags->back_buffer_offset.exchange(flags->write_buffer_offset.load());
-    flags->write_buffer_offset.exchange(old_value);
+    flags->write_buffer_offset = flags->back_buffer_offset.exchange(flags->write_buffer_offset);
+
     if(mark_dirty)
         flags->dirty.exchange(1);
 }
@@ -99,12 +99,12 @@ void * read_from_shared_memory(MEMPTR mem){ //Consumer Method
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
 
     if(flags->dirty.load()){
-        unsigned int old_value = flags->back_buffer_offset.exchange(flags->read_buffer_offset.load());
-        flags->read_buffer_offset.exchange(old_value);
+
+        flags->read_buffer_offset = flags->back_buffer_offset.exchange(flags->read_buffer_offset);
 
         flags->dirty.exchange(0);
     }
-    return (void *)&buffers_data[flags->read_buffer_offset.load()];
+    return (void *)&buffers_data[flags->read_buffer_offset];
 }
 
 void string_test(const char* text){
@@ -135,9 +135,9 @@ SharedMemory create_shared_memory_old(const char * name, const unsigned int size
 
     //Initialize flags
     auto flags = static_cast<BufferFlags*>(shm.buffers);
-    flags->read_buffer_offset.store(0);
+    flags->read_buffer_offset=0;
     flags->back_buffer_offset.store(size);
-    flags->write_buffer_offset.store(2*size);
+    flags->write_buffer_offset=2*size;
 
     flags->dirty.store(0);
 
@@ -170,9 +170,10 @@ void producer(){
     std::vector<cv::Mat> images;
     std::cout << "Loading images " << std::endl;
     for(int i = 2956; i < 3381; i++) {
-        images.push_back(imread("../resources_ego0/" + std::to_string(i) +".png", cv::IMREAD_COLOR));
+        images.push_back(imread("../resources_ego0/0" + std::to_string(i) +".png", cv::IMREAD_COLOR));
     }
     std::cout << "Finished loading images " << std::endl;
+    std::cout << "Images loaded: " << images.size() << std::endl;
     for( auto& image: images){
         auto start = high_resolution_clock::now();
         write_to_shared_memory(mem, image.data);
@@ -212,9 +213,9 @@ SharedMemory * create_shared_memory(const char * name, const unsigned int size){
 
     //Initialize flags
     auto flags = static_cast<BufferFlags*>(shm->buffers);
-    flags->read_buffer_offset.store(0);
+    flags->read_buffer_offset = 0;
     flags->back_buffer_offset.store(size);
-    flags->write_buffer_offset.store(2*size);
+    flags->write_buffer_offset = 2*size;
 
     flags->dirty.store(0);
 
