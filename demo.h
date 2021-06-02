@@ -19,11 +19,9 @@ void consumer();
 void producer();
 
 //BELOW ARE FUNCTIONS JUST FOR TESTING, DON'T BOTHER
-SharedMemory create_shared_memory_old(const char * name, const unsigned int size);
 void string_test(const char * text);
 void report_and_exit(const char* msg);
 std::atomic<int>* create_shared_atomic_memory();
-void increment_shared_integer(const std::atomic<int>& memprt);
 void increment_pointer_to_int(int * p);
 void increment_reference_to_int(int & r);
 int increment_value_of_int(int v);

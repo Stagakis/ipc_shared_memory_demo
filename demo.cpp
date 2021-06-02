@@ -7,15 +7,10 @@
 #include <opencv2/highgui.hpp>
 #include "demo.h"
 #include <chrono>
-#include "shmem.h"
+//#include "shmem.h"
 #include <unistd.h>
 
 using namespace std::chrono;
-
-void report_and_exit(const char* msg) {
-  perror(msg);
-  exit(-1);
-}
 
 void increment_pointer_to_int(int * p){
     std::cout << "BEFORE Value: " << *p << " p: " << (void *)p << std::endl;
@@ -30,7 +25,6 @@ void increment_reference_to_int(int & r){
 int increment_value_of_int(int v){
     return (v+1);
 }
-
 
 void display_image_from_shared_memory(MEMPTR mem){
     //auto image = cv::Mat(512,512, CV_8U, mem->buffers);
@@ -49,14 +43,8 @@ int * return_pointer(int * p){
 }
 
 
-
 void string_test(const char* text){
     std::cout << "Receiced text: " << text << std::endl;
-}
-
-void increment_shared_integer(const std::atomic<int>& memprt){
-
-
 }
 
 void consumer(){
@@ -88,7 +76,7 @@ void producer(){
 
 
 int main() {
-    std::cout << "0 for producer and 1 for consumer" << std::endl;
+    std::cout << "0 for producer or 1 for consumer" << std::endl;
     int choice;
     std::cin >> choice;
     if(choice)
@@ -96,5 +84,4 @@ int main() {
     else
         producer();
     return 0;
-
 }
