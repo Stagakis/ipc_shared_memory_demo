@@ -4,7 +4,8 @@
 
 #ifndef IPC_LIBRARY_DEMO_H
 #define IPC_LIBRARY_DEMO_H
-#include <atomic>
+
+#include "triple_buffer_ipc.h"
 
 extern const int image_width = 1024;
 extern const int image_height = 512;
@@ -12,40 +13,6 @@ extern const int dims = 3;
 
 extern "C"
 {
-/*//
-struct BufferFlags{
-    std::atomic<unsigned long int> read_buffer_offset;
-    std::atomic<unsigned long int> back_buffer_offset;
-    std::atomic<unsigned long int> write_buffer_offset;
-    std::atomic<unsigned long int> dirty;
-};
-//*/
-
-//*/
-struct BufferFlags{
-    unsigned long int read_buffer_offset;
-    std::atomic<unsigned long int> back_buffer_offset;
-    unsigned long int write_buffer_offset;
-    std::atomic<unsigned long int> dirty;
-};
-//*/
-
-struct SharedMemory{
-    void * buffers;
-    unsigned int single_size; //Size of a single buffer
-    unsigned int total_size;  //All 3*single_size + bufferFlags
-    const char * filename;
-};
-
-typedef SharedMemory * const MEMPTR;
-
-
-//These are the important ones
-MEMPTR create_shared_memory(const char * name, const unsigned int size);
-void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int offset = 0, bool mark_dirty = true); //Producer Method
-void * read_from_shared_memory(MEMPTR mem); //Consumer Method
-void close_shared_memory(MEMPTR mem);
-int check_dirty_bit(MEMPTR mem);
 
 void display_image_from_shared_memory(MEMPTR mem);
 void consumer();

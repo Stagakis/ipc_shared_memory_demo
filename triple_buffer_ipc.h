@@ -1,7 +1,6 @@
 #ifndef IPC_LIBRARY_TRIPLE_BUFFER_IPC_H
 #define IPC_LIBRARY_TRIPLE_BUFFER_IPC_H
-
-typedef SharedMemory * const MEMPTR;
+#include <atomic>
 
 struct BufferFlags{
     unsigned long int read_buffer_offset;
@@ -11,11 +10,13 @@ struct BufferFlags{
 };
 
 struct SharedMemory{
-    void * buffers;
-    unsigned int single_size; //Size of a single buffer
-    unsigned int total_size;  //3*single_size + bufferFlags
-    const char * filename;
+    void * const buffers;
+    const unsigned int single_size; //Size of a single buffer
+    const unsigned int total_size;  //3*single_size + bufferFlags
+    const char * const filename;
 };
+
+typedef const SharedMemory * const MEMPTR;
 
 extern "C"
 {

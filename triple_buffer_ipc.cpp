@@ -1,10 +1,21 @@
 #include "triple_buffer_ipc.h"
 
+#include <sys/mman.h>
+#include <cstring>
+#include <fcntl.h>           /* For O_* constants */
+#include <sys/stat.h>        /* For mode constants */
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+
+void report_and_exit(const char* msg) {
+    perror(msg);
+    exit(-1);
+}
 
 void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int offset, bool mark_dirty){ //Producer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags) + offset];
-
     memcpy(
             &buffers_data[flags->write_buffer_offset],
             data,
@@ -38,21 +49,17 @@ void close_shared_memory(MEMPTR mem){
 
 
 MEMPTR create_shared_memory(const char * name, const unsigned int size){
-    SharedMemory* shm = new SharedMemory {};
-
-    shm->filename = name;
     unsigned int final_size = 3*size + sizeof(BufferFlags);
-    shm->single_size = size;
-    shm->total_size = final_size;
+
 
     int fd = shm_open(name,              /* name from smem.h */
                       O_RDWR | O_CREAT,   /* read/write, create if needed */
-                      AccessPerms);             /* access permissions (0644) */
+                      0666);             /* access permissions */
     if (fd < 0) report_and_exit("Can't open shared mem segment...");
 
     ftruncate(fd, final_size); /* get the bytes */
 
-    shm->buffers = static_cast<void *>(mmap(NULL,       /* let system pick where to put segment */
+    auto buffers = static_cast<void *>(mmap(NULL,       /* let system pick where to put segment */
                                             final_size,   /* how many bytes */
                                             PROT_READ | PROT_WRITE, /* access protections */
                                             MAP_SHARED, /* mapping visible to other processes */
@@ -60,6 +67,7 @@ MEMPTR create_shared_memory(const char * name, const unsigned int size){
                                             0));         /* offset: start at 1st byte */
 
     //Initialize flags
+    MEMPTR shm = new SharedMemory {buffers, size, final_size, name};
     auto flags = static_cast<BufferFlags*>(shm->buffers);
     flags->read_buffer_offset = 0;
     flags->back_buffer_offset.store(size);
