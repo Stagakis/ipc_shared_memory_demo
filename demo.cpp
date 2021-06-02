@@ -76,14 +76,9 @@ int * return_pointer(int * p){
     return p;
 }
 
-void write_to_shared_memory(MEMPTR mem, const void * data){ //Producer Method
-    std::cout << "Mem pointer received: " << mem << " or else: " << (long int) mem << std::endl;
-    std::cout << "Mem->filename: " << mem->filename << std::endl;
-    std::cout << "Data pointer: " <<  data << std::endl;
+void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int offset, bool mark_dirty){ //Producer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
-    std::cout << "After flags" << std::endl;
-    char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
-    std::cout << "After buffers_data" << std::endl;
+    char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags) + offset];
 
     memcpy(
             &buffers_data[flags->write_buffer_offset.load()],
@@ -91,12 +86,14 @@ void write_to_shared_memory(MEMPTR mem, const void * data){ //Producer Method
             mem->single_size
             );
 
-    std::cout << "After memcopy" << std::endl;
     unsigned int old_value = flags->back_buffer_offset.exchange(flags->write_buffer_offset.load());
     flags->write_buffer_offset.exchange(old_value);
-    flags->dirty.exchange(1);
+    if(mark_dirty)
+        flags->dirty.exchange(1);
 }
-
+int check_dirty_bit(MEMPTR mem){
+    return static_cast<BufferFlags*>(mem->buffers)->dirty;
+}
 void * read_from_shared_memory(MEMPTR mem){ //Consumer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
@@ -114,7 +111,7 @@ void string_test(const char* text){
     std::cout << "Receiced text: " << text << std::endl;
 }
 
-SharedMemory create_shared_memory(const char * name, const unsigned int size){
+SharedMemory create_shared_memory_old(const char * name, const unsigned int size){
     std::cout << "Creating shared memory with name: " << name << " and size: " << size << std::endl;
     SharedMemory shm {};
     shm.filename = name;
@@ -152,6 +149,7 @@ SharedMemory create_shared_memory(const char * name, const unsigned int size){
 void close_shared_memory(MEMPTR mem){
     munmap(mem->buffers, mem->total_size); /* unmap the storage */
     shm_unlink(mem->filename); /* unlink from the backing file */
+    delete mem; //delete thyself
 }
 
 void increment_shared_integer(const std::atomic<int>& memprt){
@@ -162,9 +160,9 @@ void increment_shared_integer(const std::atomic<int>& memprt){
 void consumer(){
     auto mem = create_shared_memory("/shMemEx", dims*image_height*image_width*sizeof(uchar));
     while(true) {
-        display_image_from_shared_memory(&mem);
+        display_image_from_shared_memory(mem);
     }
-    close_shared_memory(&mem);
+    close_shared_memory(mem);
 }
 
 void producer(){
@@ -177,15 +175,15 @@ void producer(){
     std::cout << "Finished loading images " << std::endl;
     for( auto& image: images){
         auto start = high_resolution_clock::now();
-        write_to_shared_memory(&mem, image.data);
+        write_to_shared_memory(mem, image.data);
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start);
         std::cout << "Writing image to memory: " << duration.count() << std::endl;
     }
-    close_shared_memory(&mem);
+    close_shared_memory(mem);
 }
 
-SharedMemory * void_create_shared_memory(const char * name, const unsigned int size){
+SharedMemory * create_shared_memory(const char * name, const unsigned int size){
     //string_test(name);
 
     SharedMemory* shm = new SharedMemory {};
