@@ -41,7 +41,7 @@ typedef SharedMemory * const MEMPTR;
 
 
 //These are the important ones
-SharedMemory * create_shared_memory(const char * name, const unsigned int size);
+MEMPTR create_shared_memory(const char * name, const unsigned int size);
 void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int offset = 0, bool mark_dirty = true); //Producer Method
 void * read_from_shared_memory(MEMPTR mem); //Consumer Method
 void close_shared_memory(MEMPTR mem);

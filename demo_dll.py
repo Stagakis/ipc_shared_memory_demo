@@ -30,7 +30,7 @@ buffer_size = c_uint(dims*image_width*image_height)
 
 def producer(lib, mem):
     for i in range(2956, 3381):
-        image = cv2.imread( "./resources_ego0/" + str(i) +".png", cv2.IMREAD_COLOR)
+        image = cv2.imread( "./resources_ego0/0" + str(i) +".png", cv2.IMREAD_COLOR)
         lib.write_to_shared_memory(mem, image.ctypes.data, 0, True)
 
 def consumer(lib, mem):
@@ -56,8 +56,8 @@ mem = lib.create_shared_memory(str.encode(name), buffer_size)
 print(mem)
 input(".................Waiting to start...................")
 
-#producer(lib,mem)
-consumer(lib,mem)
+producer(lib,mem)
+#consumer(lib,mem)
 
 lib.close_shared_memory(mem)
 

@@ -19,9 +19,6 @@
 #include <chrono>
 using namespace std::chrono;
 
-
-
-
 void report_and_exit(const char* msg) {
   perror(msg);
   exit(-1);
@@ -89,20 +86,20 @@ void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int off
     flags->write_buffer_offset = flags->back_buffer_offset.exchange(flags->write_buffer_offset);
 
     if(mark_dirty)
-        flags->dirty.exchange(1);
+        flags->dirty.store(1);
 }
+
 int check_dirty_bit(MEMPTR mem){
     return static_cast<BufferFlags*>(mem->buffers)->dirty;
 }
+
 void * read_from_shared_memory(MEMPTR mem){ //Consumer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
 
     if(flags->dirty.load()){
-
         flags->read_buffer_offset = flags->back_buffer_offset.exchange(flags->read_buffer_offset);
-
-        flags->dirty.exchange(0);
+        flags->dirty.store(0);
     }
     return (void *)&buffers_data[flags->read_buffer_offset];
 }
@@ -184,7 +181,7 @@ void producer(){
     close_shared_memory(mem);
 }
 
-SharedMemory * create_shared_memory(const char * name, const unsigned int size){
+MEMPTR create_shared_memory(const char * name, const unsigned int size){
     //string_test(name);
 
     SharedMemory* shm = new SharedMemory {};
