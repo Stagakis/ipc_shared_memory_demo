@@ -5,7 +5,7 @@
 #ifndef IPC_LIBRARY_DEMO_H
 #define IPC_LIBRARY_DEMO_H
 
-#include "triple_buffer_ipc.h"
+#include "tbipc.h"
 
 extern const int image_width = 1024;
 extern const int image_height = 512;

@@ -3,7 +3,7 @@ import numpy as np
 import time
 import cv2
 
-lib = cdll.LoadLibrary("cmake-build-debug/libipc_library.so")
+lib = cdll.LoadLibrary("cmake-build-debug/libtbipc.so")
 
 class MEM(Structure):
     _fields_ = [('buffers', c_void_p),

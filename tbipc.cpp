@@ -1,4 +1,4 @@
-#include "triple_buffer_ipc.h"
+#include "tbipc.h"
 
 #include <sys/mman.h>
 #include <cstring>

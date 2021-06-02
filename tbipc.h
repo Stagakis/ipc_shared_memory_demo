@@ -1,5 +1,5 @@
-#ifndef IPC_LIBRARY_TRIPLE_BUFFER_IPC_H
-#define IPC_LIBRARY_TRIPLE_BUFFER_IPC_H
+#ifndef IPC_LIBRARY_TBIPC_H
+#define IPC_LIBRARY_TBIPC_H
 #include <atomic>
 
 struct BufferFlags{
@@ -27,4 +27,4 @@ void *read_from_shared_memory(MEMPTR mem); //Consumer Method
 void close_shared_memory(MEMPTR mem);
 int check_dirty_bit(MEMPTR mem);
 }
-#endif //IPC_LIBRARY_TRIPLE_BUFFER_IPC_H
+#endif //IPC_LIBRARY_TBIPC_H
