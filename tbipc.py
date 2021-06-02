@@ -41,8 +41,10 @@ lib.check_dirty_bit.restype = c_int
 class SharedMemory:
     def __init__(self, name, single_buffer_size):
         self._filename = name
-        self._filename_pointer = cast(str.encode(self._filename), c_char_p)
-        #self._filename_pointer = c_wchar_p("asd")
+    
+        #self._filename_pointer = cast(str.encode(self._filename), c_char_p) NEVER EVER USE THIS, IT'S WHAT CAUSED THE PROBLEM
+        self._filename_pointer = c_char_p(str.encode(self._filename))
+
         self._single_buffer_size = single_buffer_size
         self._mem = lib.create_shared_memory(self._filename_pointer, single_buffer_size)
     
@@ -54,7 +56,7 @@ class SharedMemory:
 
     def close_shared_memory(self):
         #FOR SOME FUCKING REASON, THE "FILENAME" ATTRIBUTE RESETS AFTER A WHILE AND I HAVE TO DO THIS SHIT AGAIN
-        self._mem.contents.filename = cast(str.encode(str(self._filename)), c_char_p)
+        #self._mem.contents.filename = cast(str.encode(str(self._filename)), c_char_p)
         lib.close_shared_memory(self._mem)
 
     def check_dirty_bit(self):

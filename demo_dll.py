@@ -39,7 +39,7 @@ name = "/shMemEx"
 mem = SharedMemory(name, buffer_size)
 
 #print(mem._mem.contents.filename)
-print("after print")
+#print("after print")
 #print(mem._mem.contents.filename)
 
 input(".................Waiting to start...................")

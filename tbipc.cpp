@@ -21,7 +21,7 @@ void report(const char* msg) {
 
 MEMPTR create_shared_memory(const char * const name, unsigned int single_buffer_size){
     unsigned int final_size = 3*single_buffer_size + sizeof(BufferFlags);
-    std::cout << "Name: " << name << std::endl;
+
     int fd = shm_open(name,              /* name from smem.h */
                       O_RDWR | O_CREAT,   /* read/write, create if needed */
                       0666);             /* access permissions */
