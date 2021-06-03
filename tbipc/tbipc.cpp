@@ -47,13 +47,13 @@ MEMPTR create_shared_memory(const char * const name, unsigned int single_buffer_
     return shm;
 }
 
-void write_to_shared_memory(MEMPTR mem, const void * data, unsigned long int offset, bool mark_dirty){ //Producer Method
+void write_to_shared_memory(MEMPTR mem, const void * data, const unsigned long int size, const unsigned long int offset, bool mark_dirty){ //Producer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags) + offset];
     memcpy(
             &buffers_data[flags->write_buffer_offset],
             data,
-            mem->single_size
+            size
     );
 
     flags->write_buffer_offset = flags->back_buffer_offset.exchange(flags->write_buffer_offset);

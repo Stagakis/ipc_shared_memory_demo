@@ -59,13 +59,13 @@ void producer(){
     std::vector<cv::Mat> images;
     std::cout << "Loading images " << std::endl;
     for(int i = 2956; i < 3381; i++) {
-        images.push_back(imread("../resources_ego0/0" + std::to_string(i) +".png", cv::IMREAD_COLOR));
+        images.push_back(imread("../resources_ego0/" + std::to_string(i) +".png", cv::IMREAD_COLOR));
     }
     std::cout << "Finished loading images " << std::endl;
     std::cout << "Images loaded: " << images.size() << std::endl;
     for( auto& image: images){
         auto start = high_resolution_clock::now();
-        write_to_shared_memory(mem, image.data);
+        write_to_shared_memory(mem, image.data, mem->single_size);
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start);
         std::cout << "Writing image to memory: " << duration.count() << std::endl;

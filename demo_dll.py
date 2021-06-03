@@ -8,22 +8,22 @@ from tbipc import SharedMemory
 dims = 3
 image_width = 1024
 image_height = 512
-buffer_size = c_uint(dims*image_width*image_height)
+buffer_size = dims*image_width*image_height
 
 
 def producer(mem):
+    print("Producing")
     for i in range(2956, 3381): #3381
-        image = cv2.imread( "./resources_ego0/0" + str(i) +".png", cv2.IMREAD_COLOR)
-        mem.write_to_shared_memory(image.ctypes.data)
+        image = cv2.imread( "./resources_ego0/" + str(i) +".png", cv2.IMREAD_COLOR)
+        mem.write_to_shared_memory(image.ctypes.data, mem.single_buffer_size)
 
 def consumer(mem):
+    print("Consuming")
+
     while(True):
         pointer = mem.read_from_shared_memory()
-
         pointer = cast(pointer, POINTER(c_uint8))
-
         image = np.ctypeslib.as_array(pointer, shape=(image_height,image_width,dims))
-        #image = np.asarray(image, dtype=np.uint8) #It's not necessary
         cv2.imshow("test", image)
         cv2.waitKey(1)
 
@@ -33,8 +33,8 @@ name = "/shMemEx"
 mem = SharedMemory(name, buffer_size)
 
 
-choice = input("0 for producer or 1 for consumer")
-if(choice == 0):
+choice = input("0 for producer or 1 for consumer \n")
+if(choice == "0"):
     producer(mem)
 else:
     consumer(mem)

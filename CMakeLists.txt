@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -25,4 +25,4 @@ target_link_libraries(tbipc PUBLIC -lpthread)
 target_link_libraries(tbipc PUBLIC -lrt)
 
 install(TARGETS tbipc DESTINATION lib)
-install(FILES tbipc.h DESTINATION include)
+install(FILES tbipc/tbipc.h DESTINATION include)

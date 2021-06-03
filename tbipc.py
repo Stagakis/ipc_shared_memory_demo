@@ -24,7 +24,7 @@ class MEM(Structure):
 lib.create_shared_memory.argtypes = [c_char_p, c_uint]
 lib.create_shared_memory.restype = POINTER(MEM)
 
-lib.write_to_shared_memory.argtypes = [POINTER(MEM), c_void_p, c_ulong, c_bool]
+lib.write_to_shared_memory.argtypes = [POINTER(MEM), c_void_p, c_ulong, c_ulong, c_bool]
 
 lib.read_from_shared_memory.argtypes = [POINTER(MEM)]
 lib.read_from_shared_memory.restype = c_void_p
@@ -44,8 +44,8 @@ class SharedMemory:
         self._single_buffer_size = single_buffer_size
         self._mem = lib.create_shared_memory(self._filename_pointer, single_buffer_size)
     
-    def write_to_shared_memory(self,data,offset=0,mark_dirty=True):
-        lib.write_to_shared_memory(self._mem,data,offset,mark_dirty)
+    def write_to_shared_memory(self, data, size, offset=0, mark_dirty=True):
+        lib.write_to_shared_memory(self._mem, data, size, offset, mark_dirty)
 
     def read_from_shared_memory(self):
         return lib.read_from_shared_memory(self._mem)
