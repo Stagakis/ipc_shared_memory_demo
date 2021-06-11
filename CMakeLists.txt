@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
-
+cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_BUILD_TYPE Debug)
 project(ipc_demo)
@@ -24,5 +23,10 @@ add_library(tbipc SHARED
 target_link_libraries(tbipc PUBLIC -lpthread)
 target_link_libraries(tbipc PUBLIC -lrt)
 
+find_package (Python3)
+#message(STATUS "PYTHON VERSION: /usr/local/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
+message(STATUS "PYTHON SAVE DIR: ${Python3_SITELIB}")
+
 install(TARGETS tbipc DESTINATION lib)
 install(FILES tbipc/tbipc.h DESTINATION include)
+install(FILES tbipc.py DESTINATION ${Python3_SITELIB})
