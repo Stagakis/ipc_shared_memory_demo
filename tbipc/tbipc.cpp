@@ -49,9 +49,9 @@ MEMPTR create_shared_memory(const char * const name, unsigned int single_buffer_
 
 void write_to_shared_memory(MEMPTR mem, const void * data, const unsigned long int size, const unsigned long int offset, bool mark_dirty){ //Producer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
-    char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags) + offset];
+    char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
     memcpy(
-            &buffers_data[flags->write_buffer_offset],
+            &buffers_data[flags->write_buffer_offset + offset],
             data,
             size
     );
@@ -62,7 +62,7 @@ void write_to_shared_memory(MEMPTR mem, const void * data, const unsigned long i
         flags->dirty.store(1);
 }
 
-void * read_from_shared_memory(MEMPTR mem){ //Consumer Method
+void * read_from_shared_memory(MEMPTR mem, unsigned long int offset){ //Consumer Method
     auto flags = static_cast<BufferFlags*>(mem->buffers);
     char * buffers_data = &static_cast<char *>(mem->buffers)[sizeof(BufferFlags)];
 
@@ -70,7 +70,7 @@ void * read_from_shared_memory(MEMPTR mem){ //Consumer Method
         flags->read_buffer_offset = flags->back_buffer_offset.exchange(flags->read_buffer_offset);
         flags->dirty.store(0);
     }
-    return (void *)&buffers_data[flags->read_buffer_offset];
+    return (void *)&buffers_data[flags->read_buffer_offset + offset];
 }
 
 int check_dirty_bit(MEMPTR mem){
