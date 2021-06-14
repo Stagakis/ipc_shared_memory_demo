@@ -29,4 +29,4 @@ message(STATUS "PYTHON SAVE DIR: ${Python3_SITELIB}")
 
 install(TARGETS tbipc DESTINATION lib)
 install(FILES tbipc/tbipc.h DESTINATION include)
-install(FILES tbipc.py DESTINATION ${Python3_SITELIB})
+install(FILES tbipc.py DESTINATION /usr/lib/python3/dist-packages/)
