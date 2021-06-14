@@ -26,7 +26,7 @@ lib.create_shared_memory.restype = POINTER(MEM)
 
 lib.write_to_shared_memory.argtypes = [POINTER(MEM), c_void_p, c_ulong, c_ulong, c_bool]
 
-lib.read_from_shared_memory.argtypes = [POINTER(MEM)]
+lib.read_from_shared_memory.argtypes = [POINTER(MEM), c_ulong]
 lib.read_from_shared_memory.restype = c_void_p
 
 lib.close_shared_memory.argtypes = [POINTER(MEM)]
@@ -47,8 +47,8 @@ class SharedMemory:
     def write_to_shared_memory(self, data, size, offset=0, mark_dirty=True):
         lib.write_to_shared_memory(self._mem, data, size, offset, mark_dirty)
 
-    def read_from_shared_memory(self):
-        return lib.read_from_shared_memory(self._mem)
+    def read_from_shared_memory(self, offset=0):
+        return lib.read_from_shared_memory(self._mem, offset)
 
     def close_shared_memory(self):
         #FOR SOME FUCKING REASON, THE "FILENAME" ATTRIBUTE RESETS AFTER A WHILE AND I HAVE TO DO THIS SHIT AGAIN. UPDATE: IT WAS THE cast()'s FAULT. FUCK YOU
