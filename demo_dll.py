@@ -4,12 +4,13 @@ import time
 import cv2
 from tbipc import SharedMemory
 
-#How to load global variables
-dims = 3
-image_width = 1024
-image_height = 512
-buffer_size = dims*image_width*image_height
-
+image_width = 1280
+image_height = 720
+dims = 4
+image_buffer_size = image_width * image_height *dims       #width * height * channels * sizeof(char) = 1
+point_cloud_max_size = 1800
+pointcloud_buffer_size = point_cloud_max_size * 4 * 4   #points * dimensions * sizeof(float)
+buffer_size = image_buffer_size + pointcloud_buffer_size
 
 def producer(mem):
     print("Producing")
@@ -17,15 +18,42 @@ def producer(mem):
         image = cv2.imread( "./resources_ego0/" + str(i) +".png", cv2.IMREAD_COLOR)
         mem.write_to_shared_memory(image.ctypes.data, mem.single_buffer_size)
 
+def visualize_pointcloud(points):
+
+    #points = np.reshape(points, (int(points.shape[0] / 4), 4))
+    lidar_data = np.array(points[:, :2])
+    lidar_data *= min( (image_width, image_height) ) / (2.0 * 50)
+    lidar_data += (0.5 * image_width, 0.5 * image_height)
+    lidar_data = np.fabs(lidar_data)  # pylint: disable=E1111
+    lidar_data = lidar_data.astype(np.int32)
+    lidar_data = np.reshape(lidar_data, (-1, 2))
+    lidar_img_size = (image_width, image_height, 3)
+    lidar_img = np.zeros((lidar_img_size), dtype=np.uint8)
+    lidar_img[tuple(lidar_data.T)] = (255, 255, 255)
+
+    cv2.imshow("Pointcloud", lidar_img)
+    cv2.waitKey(1)
+
 def consumer(mem):
     print("Consuming")
 
+    k = 0
     while(True):
         pointer = mem.read_from_shared_memory()
         pointer = cast(pointer, POINTER(c_uint8))
         image = np.ctypeslib.as_array(pointer, shape=(image_height,image_width,dims))
-        cv2.imshow("test", image)
+
+        #cv2.imwrite("./build/%09d.png" % k, np.asarray(image, dtype=np.uint8))
+
+
+        lidar_pointer = mem.read_from_shared_memory(offset=image_buffer_size)
+        lidar_pointer = cast(lidar_pointer, POINTER(c_float))
+        points = np.ctypeslib.as_array(lidar_pointer, shape=(1800,4))
+        visualize_pointcloud(points)
+
+        cv2.imshow("Image", image)
         cv2.waitKey(1)
+        k += 1
 
 
 

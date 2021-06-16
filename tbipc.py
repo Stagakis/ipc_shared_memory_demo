@@ -55,6 +55,9 @@ class SharedMemory:
         #self._mem.contents.filename = cast(str.encode(str(self._filename)), c_char_p)
         lib.close_shared_memory(self._mem)
 
+    def mark_dirty(self):
+        lib.mark_dirty(self._mem)
+
     def check_dirty_bit(self):
         return lib.check_dirty_bit(self._mem)
 

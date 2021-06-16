@@ -27,6 +27,7 @@ void write_to_shared_memory(MEMPTR mem, const void *data, unsigned long int size
 
 void *read_from_shared_memory(MEMPTR mem, unsigned long int offset = 0); //Consumer Method
 int check_dirty_bit(MEMPTR mem);
+void mark_dirty(MEMPTR mem);
 void close_shared_memory(MEMPTR mem);
 
 }
