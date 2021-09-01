@@ -1,5 +1,6 @@
 build/*
 resources_ego0/*
+resources_ego0/
 __pycache__/*
 cmake-build-debug/*
 .idea/*
