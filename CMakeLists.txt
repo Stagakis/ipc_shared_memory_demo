@@ -9,7 +9,7 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(ipc_demo demo.cpp demo.h) # tbipc.cpp tbipc.h)
+add_executable(ipc_demo demo/demo.cpp demo/demo.h)
 
 target_link_libraries(ipc_demo PUBLIC -lpthread)
 target_link_libraries(ipc_demo PUBLIC -ltbipc)
@@ -29,4 +29,4 @@ message(STATUS "PYTHON SAVE DIR: ${Python3_SITELIB}")
 
 install(TARGETS tbipc DESTINATION lib)
 install(FILES tbipc/tbipc.h DESTINATION include)
-install(FILES tbipc.py DESTINATION /usr/lib/python3/dist-packages/)
+install(FILES tbipc/tbipc.py DESTINATION /usr/lib/python3/dist-packages/)
